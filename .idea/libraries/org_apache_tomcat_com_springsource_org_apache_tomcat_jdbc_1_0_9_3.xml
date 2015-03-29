@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="org.apache.tomcat:com.springsource.org.apache.tomcat.jdbc:1.0.9.3" type="repository">
+    <properties maven-id="org.apache.tomcat:com.springsource.org.apache.tomcat.jdbc:1.0.9.3" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/tomcat/com.springsource.org.apache.tomcat.jdbc/1.0.9.3/com.springsource.org.apache.tomcat.jdbc-1.0.9.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/juli/com.springsource.org.apache.juli.extras/6.0.24/com.springsource.org.apache.juli.extras-6.0.24.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
