@@ -18,6 +18,19 @@ import java.util.*;
 public class Servlet extends HttpServlet implements Connect {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+
+        String param = request.getParameter("type");
+        if (!request.getParameter("name").equals("")){
+            request.setAttribute("err","User not found");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+
+            if (dispatcher != null) {
+
+                dispatcher.forward(request, response);
+
+            }
+        }
+else{
         if (!request.getParameter("place").equals("")){
             try {
                 Insert("insert into project.place (nameplace,current) values('" + request.getParameter("place") + "',0)");
@@ -68,7 +81,7 @@ public class Servlet extends HttpServlet implements Connect {
 
             dispatcher.forward(request, response);
 
-        }
+        }}
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

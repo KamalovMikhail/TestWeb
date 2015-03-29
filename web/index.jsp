@@ -22,10 +22,15 @@
   </select>
 
 <form action="Servlet" method="post" >
-    <input type="text" name="place" value="">
-    <input type="submit" value="Submit">
-</form>
 
+    <label>Имя</label>
+    <input type="text" name="name" value=""><h1 >${err}</h1>
+    <label>Пароль</label>
+    <input type="password" name="pass" value="">
+    <input type="submit" value="Submit">
+    <input type="hidden" name="type" value="param">
+    <A HREF="Next.jsp">Registration</A>
+</form>
 
   <%--<jsp:forward page="Next.jsp"></jsp:forward>--%>
 
