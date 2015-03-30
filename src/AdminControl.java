@@ -1,5 +1,7 @@
+import control.algorithm.Dijkstra.Graph;
 import control.connect.Connect;
 import control.object.Place;
+import control.object.Zakaz;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -34,14 +36,14 @@ public class AdminControl extends HttpServlet implements Connect {
                 List<Place> places = new LinkedList<Place>();
 
                 while (resultSet3.next()) {
-                    places.add(new Place(resultSet3.getString("nameplace"),Integer.valueOf(resultSet3.getString("idplace"))));
+                    places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
                     if (resultSet3.getString("current").equals("0"))
-                        request.setAttribute("current",resultSet3.getString("nameplace"));
+                        request.setAttribute("current", resultSet3.getString("nameplace"));
                 }
 
 
-                request.setAttribute("places1",places);
-                request.setAttribute("places2",places);
+                request.setAttribute("places1", places);
+                request.setAttribute("places2", places);
                 RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
 
                 if (dispatcher != null) {
@@ -62,29 +64,29 @@ public class AdminControl extends HttpServlet implements Connect {
             }
 
 
-
-        }else{
+        }
+        if (index.equals("1")) {
             try {
                 String place = request.getParameter("place");
                 ResultSet resultSet2 = getResultSet("Select max(place.current)+1 as mx from project.place");
 
                 resultSet2.next();
                 System.out.println(place);
-                Insert("insert into project.place (nameplace,current) values('" + request.getParameter("place") + "',"+resultSet2.getString("mx")+")");
+                Insert("insert into project.place (nameplace,current) values('" + request.getParameter("place") + "'," + resultSet2.getString("mx") + ")");
 
                 ResultSet resultSet3 = getResultSet("Select * from project.place");
 
                 List<Place> places = new LinkedList<Place>();
 
                 while (resultSet3.next()) {
-                    places.add(new Place(resultSet3.getString("nameplace"),Integer.valueOf(resultSet3.getString("idplace"))));
+                    places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
                     if (resultSet3.getString("current").equals("0"))
-                        request.setAttribute("current",resultSet3.getString("nameplace"));
+                        request.setAttribute("current", resultSet3.getString("nameplace"));
                 }
 
 
-                request.setAttribute("places1",places);
-                request.setAttribute("places2",places);
+                request.setAttribute("places1", places);
+                request.setAttribute("places2", places);
                 RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
 
                 if (dispatcher != null) {
@@ -105,9 +107,88 @@ public class AdminControl extends HttpServlet implements Connect {
             }
 
         }
+        if (index.equals("3")) {
+            try {
+                ResultSet resultSet4 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.status = 'action' and zakaz.idplace=place.idplace order by zakaz.date ASC ");
+
+                List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
+                while (resultSet4.next()) {
+                    zakazs1.add(new Zakaz(resultSet4.getString("nameplace"), resultSet4.getString("date"), Integer.valueOf(resultSet4.getString("idplace"))));
+
+                }
+                ResultSet resultSet3 = getResultSet("Select * from project.place");
+
+                List<Place> places = new LinkedList<Place>();
+
+                while (resultSet3.next()) {
+                    places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
+                    if (resultSet3.getString("current").equals("0"))
+                        request.setAttribute("current", resultSet3.getString("nameplace"));
+                }
+
+                request.setAttribute("zakaz1", zakazs1);
+                request.setAttribute("places1", places);
+                request.setAttribute("places2", places);
+                RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
+
+                if (dispatcher != null) {
+
+                    dispatcher.forward(request, response);
+
+                }
 
 
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            }
 
+
+        }
+        if (index.equals("4")) {
+            Graph theGraph = new Graph(1000);
+            try {
+                ResultSet resultSet4 = getResultSet("Select * from place where place.current =0 ");
+                resultSet4.next();
+                theGraph.addVertex(resultSet4.getString("nameplace"));
+
+                ResultSet resultSet5 = getResultSet("Select * from place where place.current <>0 order by  place.current asc");
+                {
+                    while (resultSet5.next()) {
+                        theGraph.addVertex(resultSet5.getString("nameplace"));
+                    }
+                }
+
+                ResultSet resultSet6 = getResultSet("SELECT (select place.current  from project.place where place.idplace = map.place1) as place1,(select place.current  from project.place where place.idplace = map.place2) as place2,map.time  FROM project.map  ;");
+                {
+                    while (resultSet6.next()) {
+                        theGraph.addEdge(Integer.valueOf(resultSet6.getString("place1")),Integer.valueOf(resultSet6.getString("place2")),Integer.valueOf(resultSet6.getString("time")));
+                    }
+                }
+
+
+                System.out.println("Short path");
+
+                theGraph.path();
+                System.out.println();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            }
+
+
+        }
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

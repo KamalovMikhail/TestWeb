@@ -37,19 +37,19 @@ public class UserControl extends HttpServlet  implements Connect {
             }
 
             List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
-            ResultSet resultSet4 = getResultSet("Select place.nameplace, zakaz.date from project.zakaz,project.place where zakaz.iduser = "+Integer.valueOf(usid)+" and zakaz.status = 'action' and zakaz.idplace=place.idplace");
+            ResultSet resultSet4 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.iduser = "+Integer.valueOf(usid)+" and zakaz.status = 'action' and zakaz.idplace=place.idplace");
 
             while (resultSet4.next()) {
-                zakazs1.add(new Zakaz(resultSet4.getString("nameplace"),resultSet4.getString("date")));
+                zakazs1.add(new Zakaz(resultSet4.getString("nameplace"),resultSet4.getString("date"),Integer.valueOf(resultSet4.getString("idplace"))));
 
             }
 
 
             List<Zakaz> zakazs2 = new LinkedList<Zakaz>();
-            ResultSet resultSet5 = getResultSet("Select place.nameplace, zakaz.date from project.zakaz,project.place where zakaz.iduser = "+Integer.valueOf(usid)+" and zakaz.status = 'end' and zakaz.idplace=place.idplace");
+            ResultSet resultSet5 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.iduser = "+Integer.valueOf(usid)+" and zakaz.status = 'end' and zakaz.idplace=place.idplace");
 
             while (resultSet5.next()) {
-                zakazs2.add(new Zakaz(resultSet5.getString("nameplace"),resultSet5.getString("date")));
+                zakazs2.add(new Zakaz(resultSet5.getString("nameplace"),resultSet5.getString("date"),Integer.valueOf(resultSet4.getString("idplace"))));
 
             }
 

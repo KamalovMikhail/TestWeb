@@ -29,9 +29,10 @@
         </form>
     </tr>
 
-    <tr >
+    <tr>
         <td> <h3>Добавить новый маршрут</h3></td>
-    </tr>
+
+
     <form action="AdminControl" method="post">
     <table >
 
@@ -56,6 +57,31 @@
     </form>
 
     </tr>
+    <tr>
+
+        <td> <h3>Новые заказы</h3></td>
+        <table > <c:forEach items="${zakaz1}" var="zk1">
+    <tr><td style=" border: 1px solid black;">${zk1.address}</td> <td style=" border: 1px solid black;">${zk1.date}</td><td></td></tr>
+
+    </c:forEach></table>
+     <form action="AdminControl" method="post">
+
+            <input type="hidden" name="index" value="3">
+            <tr><td><input type="submit"></td></tr>
+        </form>
+    </tr>
+
+    <tr>
+
+        <td> <h3>Выбор маршрута</h3></td>
+        <form action="AdminControl" method="post">
+            <h4>${way}</h4>
+            <input type="hidden" name="index" value="4">
+            <tr><td><input type="submit"></td></tr>
+        </form>
+
+    </tr>
+
 </table>
 
 </body>
