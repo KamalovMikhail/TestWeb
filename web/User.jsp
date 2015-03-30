@@ -14,25 +14,25 @@
 </head>
 <body>
 <table >
-    <tr style=" border: 1px solid black;">
-        <h3>Старые заказы</h3>
+    <tr >
+        <td> <h3>Старые заказы</h3></td>
     </tr>
-    <table>
-    <tr style=" border: 1px solid black;">
+    <table >
+    <tr >
         <c:forEach items="${zakaz2}" var="zk2">
-            <tr><td>${zk2.address}</td> <td>${zk2.date}</td></tr>
+            <tr><td style=" border: 1px solid black;">${zk2.address}</td> <td style=" border: 1px solid black;">${zk2.date}</td></tr>
         </c:forEach>
     </tr>
     </table>
-    <tr><h3>Новые заказы</h3></tr>
+    <tr><td><h3>Новые заказы</h3></td></tr>
     <tr>
-<table>
+<table >
         <c:forEach items="${zakaz1}" var="zk1">
-    <tr><td>${zk1.address}</td> <td>${zk1.date}</td></tr>
+    <tr><td style=" border: 1px solid black;">${zk1.address}</td> <td style=" border: 1px solid black;">${zk1.date}</td></tr>
     </c:forEach>
     </tr>
 </table>
-    <tr><h3>Добавить заказ</h3></tr>
+    <tr><td ><h3>Добавить заказ</h3></td></tr>
     <tr>
         <form action="UserControl"  method="post">
             <tr><td><label>Район</label></td></tr>
