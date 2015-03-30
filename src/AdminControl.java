@@ -23,7 +23,7 @@ public class AdminControl extends HttpServlet implements Connect {
 
         String index = request.getParameter("index");
 
-
+        String cur = request.getParameter("current");
         String place2 = request.getParameter("places2");
         String place1 = request.getParameter("places1");
         String time = request.getParameter("time");
@@ -151,30 +151,32 @@ public class AdminControl extends HttpServlet implements Connect {
 
         }
         if (index.equals("4")) {
-            Graph theGraph = new Graph(1000);
+
             try {
-                ResultSet resultSet4 = getResultSet("Select * from place where place.current =0 ");
+                ResultSet resultSet4 = getResultSet("Select count(*) as co from project.map   ");
                 resultSet4.next();
-                theGraph.addVertex(resultSet4.getString("nameplace"));
+                Graph.Edge[] GRAPH = new Graph.Edge[Integer.valueOf(resultSet4.getString("co"))];
 
-                ResultSet resultSet5 = getResultSet("Select * from place where place.current <>0 order by  place.current asc");
-                {
-                    while (resultSet5.next()) {
-                        theGraph.addVertex(resultSet5.getString("nameplace"));
-                    }
-                }
 
-                ResultSet resultSet6 = getResultSet("SELECT (select place.current  from project.place where place.idplace = map.place1) as place1,(select place.current  from project.place where place.idplace = map.place2) as place2,map.time  FROM project.map  ;");
-                {
-                    while (resultSet6.next()) {
-                        theGraph.addEdge(Integer.valueOf(resultSet6.getString("place1")),Integer.valueOf(resultSet6.getString("place2")),Integer.valueOf(resultSet6.getString("time")));
-                    }
-                }
 
+                ResultSet resultSet6 = getResultSet("SELECT (select place.nameplace  from project.place where place.idplace = map.place1) as place1,(select place.nameplace  from project.place where place.idplace = map.place2) as place2,map.time  FROM project.map  ;");
+
+                    int i=0;
+                   while (resultSet6.next()) {
+                        GRAPH[i]= new Graph.Edge(resultSet6.getString("place1"), resultSet6.getString("place2"), Integer.valueOf(resultSet6.getString("time")));
+                     i++;
+                   }
+
+                final String START = cur;
+                final String END = "Akademicheskaya";
+
+                Graph g = new Graph(GRAPH);
+                g.dijkstra(START);
+                g.printPath(END);
 
                 System.out.println("Short path");
 
-                theGraph.path();
+
                 System.out.println();
 
             } catch (SQLException e) {

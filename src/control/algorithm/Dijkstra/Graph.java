@@ -1,120 +1,126 @@
 package control.algorithm.Dijkstra;
 
+import java.util.Map;
+import java.io.*;
+import java.util.*;
 /**
  * Created by mikhail on 21.03.15.
  */
 public class Graph {
-    private final int INFINITY = 1000000;
-    private Vertex vertexList[];
-    private int adjMat[][];
-    private int nVerts;
-    private int nTree;
-    private DistPar sPath[];
-    private int currentVert;
-    private int startToCurrent;
+    private final Map<String, Vertex> graph; // mapping of vertex names to Vertex objects, built from a set of Edges
 
-    public Graph(int MAX_VERTS){
-        vertexList = new Vertex[MAX_VERTS];
-        adjMat= new int[MAX_VERTS][MAX_VERTS];
-        nVerts=0;
-        nTree=0;
-        for (int j=0;j<MAX_VERTS;j++)
-            for (int k=0;k<MAX_VERTS;k++)
-                adjMat[j][k]=INFINITY;
-        sPath = new DistPar[MAX_VERTS];
-
-    }
-    public void addVertex (String lab){
-        vertexList[nVerts++] = new Vertex(lab);
-
-    }
-
-    public void addEdge(int start,int end,int weight){
-        adjMat[start][end] = weight;
-    }
-
-    public void path(){
-        int startTree = 0;
-        vertexList[startTree].isInTree = true;
-        nTree=1;
-        for (int j=0;j<nVerts;j++){
-            int tempDist = adjMat[startTree][j];
-            sPath[j]= new DistPar(startTree,tempDist);
+    /** One edge of the graph (only used by Graph constructor) */
+    public static class Edge {
+        public final String v1, v2;
+        public final int dist;
+        public Edge(String v1, String v2, int dist) {
+            this.v1 = v1;
+            this.v2 = v2;
+            this.dist = dist;
         }
-        while(nTree<nVerts){
-            int indexMin = getMin();
-            int minDist = sPath[indexMin].distance;
-
-            if (minDist==INFINITY){
-                System.out.println("Unreachable");
-                break;
-            }
-            else
-            {
-                currentVert = indexMin;
-                startToCurrent = sPath[indexMin].distance;
-            }
-            vertexList[currentVert].isInTree = true;
-            nTree++;
-            adjust_sPath();
-        }
-            displayPath();
-            nTree = 0;
-            for (int j=0;j<nVerts;j++){
-                vertexList[j].isInTree=false;
-            }
-
     }
 
-    public int getMin(){
-        int minDist = INFINITY;
-        int indexMin = 0;
-        for (int j=1;j<nVerts;j++){
-            if (!vertexList[j].isInTree && sPath[j].distance<minDist)
-            {
-                minDist=sPath[j].distance;
-                indexMin = j;
-            }
-        }
-        return indexMin;
-    }
 
-    public void adjust_sPath(){
-        int column =1;
-        while (column<nVerts){
-            if (vertexList[column].isInTree)
-            {
-                column++;
-                continue;
-            }
-            int currentToFringe = adjMat[currentVert][column];
+    public static class Vertex implements Comparable<Vertex> {
+        public final String name;
+        public int dist = Integer.MAX_VALUE;
+        public Vertex previous = null;
+        public final Map<Vertex, Integer> neighbours = new HashMap<Vertex, Integer>();
 
-            int startToFringe = startToCurrent + currentToFringe;
-
-            int sPathDist = sPath[column].distance;
-
-            if (startToFringe<sPathDist){
-                sPath[column].parentVert=currentVert;
-                sPath[column].distance = startToFringe;
-            }
-            column++;
+        public Vertex(String name) {
+            this.name = name;
         }
 
-    }
-    public void displayPath(){
-        for (int j=0;j<nVerts;j++){
-            System.out.println(vertexList[j].label+"=");
-            if (sPath[j].distance == INFINITY)
-                System.out.println("inf");
-            else
-                System.out.println(sPath[j].distance);
-            String parent = vertexList[sPath[j].parentVert].label;
-            System.out.println("("+parent+")");
-
-
+        private void printPath() {
+            if (this == this.previous) {
+                System.out.printf("%s", this.name);
+            } else if (this.previous == null) {
+                System.out.printf("%s(unreached)", this.name);
+            } else {
+                this.previous.printPath();
+                System.out.printf(" -> %s(%d)", this.name, this.dist);
+            }
         }
-        System.out.println("");
+
+        public int compareTo(Vertex other) {
+            return Integer.compare(dist, other.dist);
+        }
     }
 
+    /** Builds a graph from a set of edges */
+    public Graph(Edge[] edges) {
+        graph = new HashMap(edges.length);
 
+        //one pass to find all vertices
+        for (Edge e : edges) {
+            if (!graph.containsKey(e.v1)) graph.put(e.v1, new Vertex(e.v1));
+            if (!graph.containsKey(e.v2)) graph.put(e.v2, new Vertex(e.v2));
+        }
+
+        //another pass to set neighbouring vertices
+        for (Edge e : edges) {
+            graph.get(e.v1).neighbours.put(graph.get(e.v2), e.dist);
+            //graph.get(e.v2).neighbours.put(graph.get(e.v1), e.dist); // also do this for an undirected graph
+        }
+    }
+
+    /** Runs dijkstra using a specified source vertex */
+    public void dijkstra(String startName) {
+        if (!graph.containsKey(startName)) {
+            System.err.printf("Graph doesn't contain start vertex \"%s\"\n", startName);
+            return;
+        }
+        final Vertex source = graph.get(startName);
+        NavigableSet<Vertex> q = new TreeSet();
+
+        // set-up vertices
+        for (Vertex v : graph.values()) {
+            v.previous = v == source ? source : null;
+            v.dist = v == source ? 0 : Integer.MAX_VALUE;
+            q.add(v);
+        }
+
+        dijkstra(q);
+    }
+
+    /** Implementation of dijkstra's algorithm using a binary heap. */
+    private void dijkstra(final NavigableSet<Vertex> q) {
+        Vertex u, v;
+        while (!q.isEmpty()) {
+
+            u = q.pollFirst(); // vertex with shortest distance (first iteration will return source)
+            if (u.dist == Integer.MAX_VALUE) break; // we can ignore u (and any other remaining vertices) since they are unreachable
+
+            //look at distances to each neighbour
+            for (Map.Entry<Vertex, Integer> a : u.neighbours.entrySet()) {
+                v = a.getKey(); //the neighbour in this iteration
+
+                final int alternateDist = u.dist + a.getValue();
+                if (alternateDist < v.dist) { // shorter path to neighbour found
+                    q.remove(v);
+                    v.dist = alternateDist;
+                    v.previous = u;
+                    q.add(v);
+                }
+            }
+        }
+    }
+
+    /** Prints a path from the source to the specified vertex */
+    public void printPath(String endName) {
+        if (!graph.containsKey(endName)) {
+            System.err.printf("Graph doesn't contain end vertex \"%s\"\n", endName);
+            return;
+        }
+
+        graph.get(endName).printPath();
+        System.out.println();
+    }
+    /** Prints the path from the source to every vertex (output order is not guaranteed) */
+    public void printAllPaths() {
+        for (Vertex v : graph.values()) {
+            v.printPath();
+            System.out.println();
+        }
+    }
 }
