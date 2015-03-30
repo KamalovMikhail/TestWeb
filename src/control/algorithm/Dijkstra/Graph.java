@@ -30,16 +30,22 @@ public class Graph {
         public Vertex(String name) {
             this.name = name;
         }
+        private static String path="";
+        private String printPath() {
 
-        private void printPath() {
             if (this == this.previous) {
                 System.out.printf("%s", this.name);
+                path = path+this.name;
             } else if (this.previous == null) {
                 System.out.printf("%s(unreached)", this.name);
+                path = this.name+ "(unreached)";
             } else {
                 this.previous.printPath();
                 System.out.printf(" -> %s(%d)", this.name, this.dist);
+                path = path+" ->"+this.name+" ("+this.dist+")" ;
+
             }
+            return path;
         }
 
         public int compareTo(Vertex other) {
@@ -107,14 +113,16 @@ public class Graph {
     }
 
     /** Prints a path from the source to the specified vertex */
-    public void printPath(String endName) {
+    public String printPath(String endName) {
         if (!graph.containsKey(endName)) {
             System.err.printf("Graph doesn't contain end vertex \"%s\"\n", endName);
-            return;
+            return "Graph doesn't contain end vertex \"%s\"\n" +
+                    "\"";
         }
 
-        graph.get(endName).printPath();
-        System.out.println();
+
+        return  (graph.get(endName).printPath());
+       // System.out.println();
     }
     /** Prints the path from the source to every vertex (output order is not guaranteed) */
     public void printAllPaths() {

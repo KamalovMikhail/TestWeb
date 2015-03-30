@@ -75,8 +75,20 @@
 
         <td> <h3>Выбор маршрута</h3></td>
         <form action="AdminControl" method="post">
-            <h4>${way}</h4>
+            <tr><td><h4 style="color: crimson">${way}</h4></td></tr>
             <input type="hidden" name="index" value="4">
+            <tr><td><input type="submit"></td></tr>
+        </form>
+
+    </tr>
+
+    <tr>
+
+        <td> <h3>Выполнить заказ</h3></td>
+        <form action="AdminControl" method="post">
+            <h4></h4>
+            <input type="hidden" name="way" value="${way}">
+            <input type="hidden" name="index" value="5">
             <tr><td><input type="submit"></td></tr>
         </form>
 

@@ -167,17 +167,53 @@ public class AdminControl extends HttpServlet implements Connect {
                      i++;
                    }
 
-                final String START = cur;
-                final String END = "Akademicheskaya";
+
+
+                ResultSet resultSet5 = getResultSet("Select *  from project.place  where place.current = 0  ");
+                resultSet5.next();
+
+                ResultSet resultSet7 = getResultSet("Select *  from project.place  where place.idplace = ( Select min(idplace)  from project.zakaz  where zakaz.status = 'action' ) ");
+                resultSet7.next();
+
+                final String START = resultSet5.getString("nameplace");
+                final String END = resultSet7.getString("nameplace");
 
                 Graph g = new Graph(GRAPH);
                 g.dijkstra(START);
-                g.printPath(END);
-
-                System.out.println("Short path");
-
-
+                String s = g.printPath(END);
                 System.out.println();
+                System.out.println(s+"!!!!!");
+
+
+
+                ResultSet resultSet2 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.status = 'action' and zakaz.idplace=place.idplace order by zakaz.date ASC ");
+
+                List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
+                while (resultSet2.next()) {
+                    zakazs1.add(new Zakaz(resultSet2.getString("nameplace"), resultSet2.getString("date"), Integer.valueOf(resultSet2.getString("idplace"))));
+
+                }
+                ResultSet resultSet3 = getResultSet("Select * from project.place");
+
+                List<Place> places = new LinkedList<Place>();
+
+                while (resultSet3.next()) {
+                    places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
+                    if (resultSet3.getString("current").equals("0"))
+                        request.setAttribute("current", resultSet3.getString("nameplace"));
+                }
+
+                request.setAttribute("way", s);
+                request.setAttribute("zakaz1", zakazs1);
+                request.setAttribute("places1", places);
+                request.setAttribute("places2", places);
+                RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
+
+                if (dispatcher != null) {
+
+                    dispatcher.forward(request, response);
+
+                }
 
             } catch (SQLException e) {
                 e.printStackTrace();
