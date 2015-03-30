@@ -24,7 +24,7 @@ public class Graph {
         sPath = new DistPar[MAX_VERTS];
 
     }
-    public void addVertex (char lab){
+    public void addVertex (String lab){
         vertexList[nVerts++] = new Vertex(lab);
 
     }
@@ -108,7 +108,7 @@ public class Graph {
                 System.out.println("inf");
             else
                 System.out.println(sPath[j].distance);
-            char parent = vertexList[sPath[j].parentVert].label;
+            String parent = vertexList[sPath[j].parentVert].label;
             System.out.println("("+parent+")");
 
 

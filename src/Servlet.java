@@ -91,6 +91,32 @@ public class Servlet extends HttpServlet implements Connect {
 
                             }
                         }
+                    else{
+                            ResultSet resultSet3 = getResultSet("Select * from project.place");
+
+                            List<Place> places = new LinkedList<Place>();
+
+                            while (resultSet3.next()) {
+                                if (resultSet3.getString("current").equals("0"))
+                                    request.setAttribute("current",resultSet3.getString("nameplace"));
+                                places.add(new Place(resultSet3.getString("nameplace"),Integer.valueOf(resultSet3.getString("idplace"))));
+
+                            }
+
+
+
+
+                            request.setAttribute("places1",places);
+                            request.setAttribute("places2",places);
+                            RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
+
+                            if (dispatcher != null) {
+
+                                dispatcher.forward(request, response);
+
+                            }
+                        }
+
 
                 }
             }
