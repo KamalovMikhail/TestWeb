@@ -17,20 +17,24 @@
     <tr style=" border: 1px solid black;">
         <h3>Старые заказы</h3>
     </tr>
+    <table>
     <tr style=" border: 1px solid black;">
-        <c:forEach items="${zakaz2}" var="zk">
-            <tr><td>${zk.address}</td> <td>${zk.date}</td></tr>
+        <c:forEach items="${zakaz2}" var="zk2">
+            <tr><td>${zk2.address}</td> <td>${zk2.date}</td></tr>
         </c:forEach>
     </tr>
+    </table>
     <tr><h3>Новые заказы</h3></tr>
     <tr>
-        <c:forEach items="${zakaz1}" var="zk">
-    <tr><td>${zk.iaddress}</td> <td>${zk.date}</td></tr>
+<table>
+        <c:forEach items="${zakaz1}" var="zk1">
+    <tr><td>${zk1.address}</td> <td>${zk1.date}</td></tr>
     </c:forEach>
     </tr>
+</table>
     <tr><h3>Добавить заказ</h3></tr>
     <tr>
-        <form method="post">
+        <form action="UserControl"  method="post">
             <tr><td><label>Район</label></td></tr>
             <tr><td><select name="places">
                 <c:forEach items="${places}" var="pl">

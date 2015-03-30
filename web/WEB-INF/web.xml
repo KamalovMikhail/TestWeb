@@ -20,6 +20,14 @@
 
 
     <servlet>
+        <servlet-name>UserControl</servlet-name>
+        <servlet-class>UserControl</servlet-class>
+
+    </servlet>
+    <servlet-mapping> <servlet-name>UserControl</servlet-name> <url-pattern>/UserControl</url-pattern> </servlet-mapping>
+
+
+    <servlet>
         <servlet-name>Registration</servlet-name>
         <servlet-class>Registration</servlet-class>
 
