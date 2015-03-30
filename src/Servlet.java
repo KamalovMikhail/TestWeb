@@ -20,7 +20,7 @@ public class Servlet extends HttpServlet implements Connect {
 
 
         String param = request.getParameter("type");
-        if (!request.getParameter("name").equals("")){
+        if (request.getParameter("name").equals("null")){
             request.setAttribute("err","User not found");
             RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
 

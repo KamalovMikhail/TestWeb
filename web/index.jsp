@@ -24,9 +24,9 @@
 <form action="Servlet" method="post" >
 
     <label>Имя</label>
-    <input type="text" name="name" value=""><h1 >${err}</h1>
+    <input type="text" name="name" value="null"><h1 >${err}</h1>
     <label>Пароль</label>
-    <input type="password" name="pass" value="">
+    <input type="password" name="pass" value="null">
     <input type="submit" value="Submit">
     <input type="hidden" name="type" value="param">
     <A HREF="Next.jsp">Registration</A>
