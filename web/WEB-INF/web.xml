@@ -17,6 +17,17 @@
     <servlet-mapping> <servlet-name>Servlet</servlet-name> <url-pattern>/Servlet</url-pattern> </servlet-mapping>
 
 
+
+
+    <servlet>
+        <servlet-name>Registration</servlet-name>
+        <servlet-class>Registration</servlet-class>
+
+    </servlet>
+    <servlet-mapping> <servlet-name>Registration</servlet-name> <url-pattern>/Registration</url-pattern> </servlet-mapping>
+
+
+
 <servlet>
     <servlet-name>Servlet2</servlet-name>
     <servlet-class>control.Servlet2</servlet-class>

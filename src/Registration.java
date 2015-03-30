@@ -15,41 +15,38 @@ import java.sql.*;
 @WebServlet(name = "Registration")
 public class Registration extends HttpServlet  implements Connect {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("!!!");
+        String name = request.getParameter("name");
+        String login = request.getParameter("login");
+        String pass = request.getParameter("pass");
 
-    String name = request.getParameter("name");
-    String login = request.getParameter("login");
-    String pass =  request.getParameter("pass");
-
-    String query = "SELECT * FROM project.user where user.login = '"+login+"';";
+        String query = "SELECT * FROM project.user where user.login = '" + login + "';";
         try {
             ResultSet resultSet = getResultSet(query);
-            while (resultSet.next()) {
-              if (request.getParameter("name").equals(null))
-              {
-                  Insert("insert into project.name (name,login,password,status) values ('" + name + "','" + login + "','" + pass + "',0)");
-                  request.setAttribute("err","Вы успешно зарегестрированы");
-                  RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+            if (!resultSet.next()) {
+                System.out.println(request.getParameter("name") + "1");
+                Insert("insert into project.user (name,login,password,status) values ('" + name + "','" + login + "','" + pass + "',0)");
+                request.setAttribute("err", "Вы успешно зарегестрированы");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
 
-                  if (dispatcher != null) {
+                if (dispatcher != null) {
 
-                      dispatcher.forward(request, response);
+                    dispatcher.forward(request, response);
 
-                  }
-                  break;
-              }
-                else
-              {
-                  request.setAttribute("err","Пользователь с данным логином существует");
-                  RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+                }
 
-                  if (dispatcher != null) {
+            } else {
+                System.out.println(request.getParameter("name") + "2");
+                request.setAttribute("err", "Пользователь с данным логином существует");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("Next.jsp");
 
-                      dispatcher.forward(request, response);
+                if (dispatcher != null) {
+                    dispatcher.forward(request, response);
+                }
 
-                  }
-                  break;
-              }
             }
+
+
 
         } catch (SQLException e) {
             e.printStackTrace();

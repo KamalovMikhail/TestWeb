@@ -11,18 +11,31 @@
     <title>NEXT</title>
 </head>
 <body>
-<h4>NEXT</h4>
-<form action="Registration" method="post" >
 
-    <label>Имя</label>
-    <input type="text" name="name" value="null"><h1 ></h1>
-    <label>Login</label>
-    <input type="text" name="login" value="null"><h5>${err}</h5>
-    <label>Пароль</label>
-    <input type="password" name="pass" value="null">
-    <input type="submit" value="Submit">
-    <input type="hidden" name="type" value="param">
+<form action="Registration" method="post" >
+    <table style="width:100%">
+        <tr style="color: red">
+            ${err}
+        </tr>
+        <tr>
+            <td><label>Имя</label></td>
+            <td><input type="text" name="name" value="null"></td>
+        </tr>
+        <tr>
+            <td><label>Login</label></td>
+            <td><input type="text" name="login" value="null"></td>
+        </tr>
+        <tr>
+            <td><label>Пароль</label></td>
+            <td><input type="password" name="pass" value="null"></td>
+        </tr>
+        <tr>
+            <td><input type="submit" value="Submit"> </td>
+        </tr>
+    </table>
+
 
 </form>
+
 </body>
 </html>

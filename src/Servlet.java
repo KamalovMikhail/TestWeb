@@ -19,19 +19,70 @@ public class Servlet extends HttpServlet implements Connect {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 
-        String param = request.getParameter("type");
-        if (request.getParameter("name").equals("null")){
-            request.setAttribute("err","User not found");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+        String login = request.getParameter("login");
+        String pass = request.getParameter("pass");
+        String query1 = "SELECT * FROM project.user where user.login = '" + login + "';";
+        String query2 = "SELECT * FROM project.user where user.login = '" + login + "' and user.password='"+pass+"';";
+        try {
+            ResultSet resultSet = getResultSet(query1);
+            if(!resultSet.next()){
+                request.setAttribute("err", "Такого пользователя не существует");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
 
-            if (dispatcher != null) {
+                if (dispatcher != null) {
 
-                dispatcher.forward(request, response);
+                    dispatcher.forward(request, response);
 
+                }
+            }else{
+                ResultSet resultSet2 = getResultSet(query2);
+                if (!resultSet2.next()){
+                    request.setAttribute("err", "Вы неправильно ввели пароль");
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+
+                    if (dispatcher != null) {
+
+                        dispatcher.forward(request, response);
+
+                    }
+                }
+                else{
+
+
+                        if (resultSet2.getString("status").equals("0")){
+                            ResultSet resultSet3 = getResultSet("Select * from project.place");
+
+                            List<Place> places = new LinkedList<Place>();
+                            while (resultSet3.next()) {
+                                places.add(new Place(resultSet3.getString("nameplace"),Integer.valueOf(resultSet3.getString("idplace"))));
+
+                            }
+                            request.setAttribute("places",places);
+                            RequestDispatcher dispatcher = request.getRequestDispatcher("User.jsp");
+
+                            if (dispatcher != null) {
+
+                                dispatcher.forward(request, response);
+
+                            }
+                        }
+
+                }
             }
-        }
-else{
-        if (!request.getParameter("place").equals("")){
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+    } catch (IllegalAccessException e) {
+        e.printStackTrace();
+    } catch (InstantiationException e) {
+        e.printStackTrace();
+    }
+
+
+
+       /* if (!request.getParameter("place").equals("")){
             try {
                 Insert("insert into project.place (nameplace,current) values('" + request.getParameter("place") + "',0)");
 
@@ -45,8 +96,8 @@ else{
                 e.printStackTrace();
             }
         }
-
-
+*/
+/*
 
        List<Place> places = new LinkedList<Place>();
 
@@ -81,8 +132,9 @@ else{
 
             dispatcher.forward(request, response);
 
-        }}
+        }*/
     }
+
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     doPost(request,response);
