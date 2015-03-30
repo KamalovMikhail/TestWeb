@@ -1,5 +1,6 @@
 import control.connect.Connect;
 import control.object.Place;
+import control.object.Zakaz;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -53,11 +54,35 @@ public class Servlet extends HttpServlet implements Connect {
                             ResultSet resultSet3 = getResultSet("Select * from project.place");
 
                             List<Place> places = new LinkedList<Place>();
+                            String idu = resultSet2.getString("iduser");
                             while (resultSet3.next()) {
                                 places.add(new Place(resultSet3.getString("nameplace"),Integer.valueOf(resultSet3.getString("idplace"))));
 
                             }
+
+                            List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
+                            ResultSet resultSet4 = getResultSet("Select place.nameplace, zakaz.date from project.zakaz,project.place where zakaz.iduser = "+Integer.valueOf(idu)+" and zakaz.status = 'action' and zakaz.idplace=place.idplace");
+
+                            while (resultSet4.next()) {
+                                zakazs1.add(new Zakaz(resultSet4.getString("nameplace"),resultSet4.getString("date")));
+
+                            }
+
+
+                            List<Zakaz> zakazs2 = new LinkedList<Zakaz>();
+                            ResultSet resultSet5 = getResultSet("Select place.nameplace, zakaz.date from project.zakaz,project.place where zakaz.iduser = "+Integer.valueOf(idu)+" and zakaz.status = 'end' and zakaz.idplace=place.idplace");
+
+                            while (resultSet5.next()) {
+                                zakazs2.add(new Zakaz(resultSet5.getString("nameplace"),resultSet5.getString("date")));
+
+                            }
+
+                            request.setAttribute("zakaz1",zakazs1);
+                            request.setAttribute("zakaz2",zakazs2);
                             request.setAttribute("places",places);
+
+                            request.setAttribute("places",places);
+                            request.setAttribute("idu",idu);
                             RequestDispatcher dispatcher = request.getRequestDispatcher("User.jsp");
 
                             if (dispatcher != null) {

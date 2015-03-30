@@ -13,18 +13,20 @@
 
 </head>
 <body>
-<table>
-    <tr>
+<table >
+    <tr style=" border: 1px solid black;">
         <h3>Старые заказы</h3>
     </tr>
-    <tr>
-        <td></td>
-        <td></td>
+    <tr style=" border: 1px solid black;">
+        <c:forEach items="${zakaz2}" var="zk">
+            <tr><td>${zk.address}</td> <td>${zk.date}</td></tr>
+        </c:forEach>
     </tr>
     <tr><h3>Новые заказы</h3></tr>
     <tr>
-        <td></td>
-        <td></td>
+        <c:forEach items="${zakaz1}" var="zk">
+    <tr><td>${zk.iaddress}</td> <td>${zk.date}</td></tr>
+    </c:forEach>
     </tr>
     <tr><h3>Добавить заказ</h3></tr>
     <tr>
@@ -35,6 +37,7 @@
                     <option value="${pl.id}">${pl.name}</option>
                 </c:forEach>
             </select></td></tr>
+            <input type="hidden" value="${idu}" name="idu">
             <tr><td><input type="submit" value="Submit"> </td></tr>
         </form>
     </tr>
