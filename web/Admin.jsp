@@ -17,7 +17,7 @@
         <td> <h3>Ваше текущее местоположение</h3></td>
 
     </tr>
-    <tr><td>${current}</td></tr>
+    <tr><td style="color: crimson">${current}</td></tr>
     </tr>
     <tr>
         <td> <h3>Добавить новый путь</h3></td>

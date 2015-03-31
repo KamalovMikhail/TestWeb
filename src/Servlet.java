@@ -73,12 +73,22 @@ public class Servlet extends HttpServlet implements Connect {
                             ResultSet resultSet5 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.iduser = "+Integer.valueOf(idu)+" and zakaz.status = 'end' and zakaz.idplace=place.idplace");
 
                             while (resultSet5.next()) {
-                                zakazs2.add(new Zakaz(resultSet5.getString("nameplace"),resultSet5.getString("date"),Integer.valueOf(resultSet4.getString("idplace"))));
+                                zakazs2.add(new Zakaz(resultSet5.getString("nameplace"),resultSet5.getString("date"),Integer.valueOf(resultSet5.getString("idplace"))));
 
                             }
 
+                            List<Zakaz> zakazs3 = new LinkedList<Zakaz>();
+                            ResultSet resultSet6 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.iduser = "+Integer.valueOf(idu)+" and zakaz.status = 'not' and zakaz.idplace=place.idplace");
+
+                            while (resultSet6.next()) {
+                                zakazs3.add(new Zakaz(resultSet6.getString("nameplace"),resultSet6.getString("date"),Integer.valueOf(resultSet6.getString("idplace"))));
+
+                            }
+
+
                             request.setAttribute("zakaz1",zakazs1);
                             request.setAttribute("zakaz2",zakazs2);
+                            request.setAttribute("zakaz3",zakazs3);
                             request.setAttribute("places",places);
 
                             request.setAttribute("places",places);

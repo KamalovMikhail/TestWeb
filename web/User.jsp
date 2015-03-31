@@ -15,7 +15,7 @@
 <body>
 <table >
     <tr >
-        <td> <h3>Старые заказы</h3></td>
+        <td> <h3>Выполненные заказы</h3></td>
     </tr>
     <table >
     <tr >
@@ -23,6 +23,16 @@
             <tr><td style=" border: 1px solid black;">${zk2.address}</td> <td style=" border: 1px solid black;">${zk2.date}</td></tr>
         </c:forEach>
     </tr>
+    </table>
+    <tr >
+        <td> <h3>Невозможно добраться</h3></td>
+    </tr>
+    <table >
+        <tr >
+            <c:forEach items="${zakaz3}" var="zk3">
+        <tr><td style=" border: 1px solid black;">${zk3.address}</td> <td style=" border: 1px solid black;">${zk3.date}</td></tr>
+        </c:forEach>
+        </tr>
     </table>
     <tr><td><h3>Новые заказы</h3></td></tr>
     <tr>

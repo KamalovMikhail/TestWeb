@@ -7,6 +7,7 @@ import java.util.*;
  * Created by mikhail on 21.03.15.
  */
 public class Graph {
+    public static String path="";
     private final Map<String, Vertex> graph; // mapping of vertex names to Vertex objects, built from a set of Edges
 
     /** One edge of the graph (only used by Graph constructor) */
@@ -30,7 +31,7 @@ public class Graph {
         public Vertex(String name) {
             this.name = name;
         }
-        private static String path="";
+
         private String printPath() {
 
             if (this == this.previous) {
@@ -38,7 +39,7 @@ public class Graph {
                 path = path+this.name;
             } else if (this.previous == null) {
                 System.out.printf("%s(unreached)", this.name);
-                path = this.name+ "(unreached)";
+                path ="Невозможно добраться" ;
             } else {
                 this.previous.printPath();
                 System.out.printf(" -> %s(%d)", this.name, this.dist);
