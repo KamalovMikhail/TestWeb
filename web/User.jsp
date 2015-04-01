@@ -16,6 +16,19 @@
 <table >
     <tr >
         <td> <h3>Выполненные заказы</h3></td>
+        <td><h3>Добавить заказ</h3>
+        <form action="UserControl"  method="post">
+            <tr><td><label>Район</label></td></tr>
+            <tr><td><select name="places">
+                <c:forEach items="${places}" var="pl">
+                    <option value="${pl.id}">${pl.name}</option>
+                </c:forEach>
+            </select></td></tr>
+            <input type="hidden" value="${idu}" name="idu">
+            <tr><td><input type="submit" value="Submit"> </td></tr>
+        </form></td>
+
+
     </tr>
     <table >
     <tr >
@@ -42,19 +55,7 @@
     </c:forEach>
     </tr>
 </table>
-    <tr><td ><h3>Добавить заказ</h3></td></tr>
-    <tr>
-        <form action="UserControl"  method="post">
-            <tr><td><label>Район</label></td></tr>
-            <tr><td><select name="places">
-                <c:forEach items="${places}" var="pl">
-                    <option value="${pl.id}">${pl.name}</option>
-                </c:forEach>
-            </select></td></tr>
-            <input type="hidden" value="${idu}" name="idu">
-            <tr><td><input type="submit" value="Submit"> </td></tr>
-        </form>
-    </tr>
+
 </table>
 
 

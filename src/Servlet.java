@@ -209,6 +209,7 @@ public class Servlet extends HttpServlet implements Connect {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         conn = (Connection) DriverManager.getConnection(DB_URL, USER, PASS);
         Statement statement = conn.createStatement();
+        statement.execute("SET CHARACTER SET 'utf8';");
         statement.execute(query);
 
     }
@@ -217,7 +218,9 @@ public class Servlet extends HttpServlet implements Connect {
         Statement stmt = null;
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         conn = (Connection) DriverManager.getConnection(DB_URL, USER, PASS);
+
         Statement statement = conn.createStatement();
+        statement.execute("SET CHARACTER SET 'utf8';");
         ResultSet result = statement.executeQuery(query);
         return result;
 

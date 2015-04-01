@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by mikhail on 30.03.15.
@@ -153,21 +154,6 @@ public class AdminControl extends HttpServlet implements Connect {
         if (index.equals("4")) {
 
             try {
-                ResultSet resultSet4 = getResultSet("Select count(*) as co from project.map   ");
-                resultSet4.next();
-                Graph.Edge[] GRAPH = new Graph.Edge[Integer.valueOf(resultSet4.getString("co"))];
-
-
-
-                ResultSet resultSet6 = getResultSet("SELECT (select place.nameplace  from project.place where place.idplace = map.place1) as place1,(select place.nameplace  from project.place where place.idplace = map.place2) as place2,map.time  FROM project.map  ;");
-
-                    int i=0;
-                   while (resultSet6.next()) {
-                        GRAPH[i]= new Graph.Edge(resultSet6.getString("place1"), resultSet6.getString("place2"), Integer.valueOf(resultSet6.getString("time")));
-                     i++;
-                   }
-
-
 
                 ResultSet resultSet5 = getResultSet("Select *  from project.place  where place.current = 0  ");
                 resultSet5.next();
@@ -175,46 +161,162 @@ public class AdminControl extends HttpServlet implements Connect {
                 ResultSet resultSet7 = getResultSet("Select *  from project.place  where place.idplace = (Select idplace  from project.zakaz  where zakaz.idzakaz = (Select min(idzakaz)  from project.zakaz  where zakaz.status = 'action' )) ");
                 resultSet7.next();
 
-                final String START = resultSet5.getString("nameplace");
-                final String END = resultSet7.getString("nameplace");
+                ResultSet existWay = getResultSet("Select * from project.shortWay where (shortWay.start = "+Integer.valueOf(resultSet5.getString("idplace"))+" and shortWay.end = "+Integer.valueOf(resultSet7.getString("idplace"))+") or (shortWay.start = "+Integer.valueOf(resultSet7.getString("idplace"))+" and shortWay.end = "+Integer.valueOf(resultSet5.getString("idplace"))+")");
 
-                Graph g = new Graph(GRAPH);
-                g.dijkstra(START);
-                String s = g.printPath(END);
-                System.out.println();
-                System.out.println(s+"!!!!!");
+                if (existWay.next()){
+                    if ((existWay.getString("time").equals("0"))){
 
-                Graph.path="";
+                        ResultSet resultSet4 = getResultSet("Select count(*) as co from project.map   ");
+                        resultSet4.next();
+                        Graph.Edge[] GRAPH = new Graph.Edge[Integer.valueOf(resultSet4.getString("co")) * 2];
 
-                ResultSet resultSet2 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.status = 'action' and zakaz.idplace=place.idplace order by zakaz.date ASC ");
 
-                List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
-                while (resultSet2.next()) {
-                    zakazs1.add(new Zakaz(resultSet2.getString("nameplace"), resultSet2.getString("date"), Integer.valueOf(resultSet2.getString("idplace"))));
+                        ResultSet resultSet6 = getResultSet("SELECT (select place.nameplace  from project.place where place.idplace = map.place1) as place1,(select place.nameplace  from project.place where place.idplace = map.place2) as place2,map.time  FROM project.map  ;");
 
+                        int i = 0;
+                        while (resultSet6.next()) {
+                            GRAPH[i] = new Graph.Edge(resultSet6.getString("place1"), resultSet6.getString("place2"), Integer.valueOf(resultSet6.getString("time")));
+                            i++;
+                            GRAPH[i] = new Graph.Edge(resultSet6.getString("place2"), resultSet6.getString("place1"), Integer.valueOf(resultSet6.getString("time")));
+                            i++;
+
+                        }
+
+
+                        final String START = resultSet5.getString("nameplace");
+                        final String END = resultSet7.getString("nameplace");
+
+                        Graph g = new Graph(GRAPH);
+                        g.dijkstra(START);
+                        String s = g.printPath(END);
+                        System.out.println();
+                        System.out.println(s + "!!!!!");
+
+                        Graph.path = "";
+
+                        ResultSet resultSet2 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.status = 'action' and zakaz.idplace=place.idplace order by zakaz.date ASC ");
+
+                        List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
+                        while (resultSet2.next()) {
+                            zakazs1.add(new Zakaz(resultSet2.getString("nameplace"), resultSet2.getString("date"), Integer.valueOf(resultSet2.getString("idplace"))));
+
+                        }
+                        ResultSet resultSet3 = getResultSet("Select * from project.place");
+
+                        List<Place> places = new LinkedList<Place>();
+
+                        while (resultSet3.next()) {
+                            places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
+                            if (resultSet3.getString("current").equals("0"))
+                                request.setAttribute("current", resultSet3.getString("nameplace"));
+                        }
+
+                        request.setAttribute("way", s);
+                        request.setAttribute("zakaz1", zakazs1);
+                        request.setAttribute("places1", places);
+                        request.setAttribute("places2", places);
+                        RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
+
+                        if (dispatcher != null) {
+
+                            dispatcher.forward(request, response);
+
+                        }
+
+                    }
+
+else {
+                        String s = "";
+                        s = existWay.getString("string");
+                        ResultSet resultSet2 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.status = 'action' and zakaz.idplace=place.idplace order by zakaz.date ASC ");
+
+                        List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
+                        while (resultSet2.next()) {
+                            zakazs1.add(new Zakaz(resultSet2.getString("nameplace"), resultSet2.getString("date"), Integer.valueOf(resultSet2.getString("idplace"))));
+
+                        }
+                        ResultSet resultSet3 = getResultSet("Select * from project.place");
+
+                        List<Place> places = new LinkedList<Place>();
+
+                        while (resultSet3.next()) {
+                            places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
+                            if (resultSet3.getString("current").equals("0"))
+                                request.setAttribute("current", resultSet3.getString("nameplace"));
+                        }
+
+                        request.setAttribute("way", s);
+                        request.setAttribute("zakaz1", zakazs1);
+                        request.setAttribute("places1", places);
+                        request.setAttribute("places2", places);
+                        RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
+
+                        if (dispatcher != null) {
+
+                            dispatcher.forward(request, response);
+
+                        }
+                    }           }
+                else {
+
+
+                    ResultSet resultSet4 = getResultSet("Select count(*) as co from project.map   ");
+                    resultSet4.next();
+                    Graph.Edge[] GRAPH = new Graph.Edge[Integer.valueOf(resultSet4.getString("co")) * 2];
+
+
+                    ResultSet resultSet6 = getResultSet("SELECT (select place.nameplace  from project.place where place.idplace = map.place1) as place1,(select place.nameplace  from project.place where place.idplace = map.place2) as place2,map.time  FROM project.map  ;");
+
+                    int i = 0;
+                    while (resultSet6.next()) {
+                        GRAPH[i] = new Graph.Edge(resultSet6.getString("place1"), resultSet6.getString("place2"), Integer.valueOf(resultSet6.getString("time")));
+                        i++;
+                        GRAPH[i] = new Graph.Edge(resultSet6.getString("place2"), resultSet6.getString("place1"), Integer.valueOf(resultSet6.getString("time")));
+                        i++;
+
+                    }
+
+
+                    final String START = resultSet5.getString("nameplace");
+                    final String END = resultSet7.getString("nameplace");
+
+                    Graph g = new Graph(GRAPH);
+                    g.dijkstra(START);
+                    String s = g.printPath(END);
+                    System.out.println();
+                    System.out.println(s + "!!!!!");
+
+                    Graph.path = "";
+
+                    ResultSet resultSet2 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.status = 'action' and zakaz.idplace=place.idplace order by zakaz.date ASC ");
+
+                    List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
+                    while (resultSet2.next()) {
+                        zakazs1.add(new Zakaz(resultSet2.getString("nameplace"), resultSet2.getString("date"), Integer.valueOf(resultSet2.getString("idplace"))));
+
+                    }
+                    ResultSet resultSet3 = getResultSet("Select * from project.place");
+
+                    List<Place> places = new LinkedList<Place>();
+
+                    while (resultSet3.next()) {
+                        places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
+                        if (resultSet3.getString("current").equals("0"))
+                            request.setAttribute("current", resultSet3.getString("nameplace"));
+                    }
+
+                    request.setAttribute("way", s);
+                    request.setAttribute("zakaz1", zakazs1);
+                    request.setAttribute("places1", places);
+                    request.setAttribute("places2", places);
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
+
+                    if (dispatcher != null) {
+
+                        dispatcher.forward(request, response);
+
+                    }
                 }
-                ResultSet resultSet3 = getResultSet("Select * from project.place");
-
-                List<Place> places = new LinkedList<Place>();
-
-                while (resultSet3.next()) {
-                    places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
-                       if (resultSet3.getString("current").equals("0"))
-                           request.setAttribute("current", resultSet3.getString("nameplace"));
-                }
-
-                request.setAttribute("way", s);
-                request.setAttribute("zakaz1", zakazs1);
-                request.setAttribute("places1", places);
-                request.setAttribute("places2", places);
-                RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
-
-                if (dispatcher != null) {
-
-                    dispatcher.forward(request, response);
-
-                }
-
             } catch (SQLException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -237,42 +339,109 @@ public class AdminControl extends HttpServlet implements Connect {
 
                     ResultSet resultSet5 = getResultSet("Select *  from project.place  where place.current = 0  ");
                     resultSet5.next();
+                    ResultSet existWay = getResultSet("Select * from project.shortWay where (shortWay.start = "+Integer.valueOf(resultSet5.getString("idplace"))+" and shortWay.end = "+Integer.valueOf(resultSet7.getString("idplace"))+") or (shortWay.start = "+Integer.valueOf(resultSet7.getString("idplace"))+" and shortWay.end = "+Integer.valueOf(resultSet5.getString("idplace"))+")");
+
+
                     Update("Update project.place set current=1 where place.idplace = " + Integer.valueOf(resultSet5.getString("idplace")) + "");
 
                     Update("Update project.place set current=0 where place.idplace = " + Integer.valueOf(resultSet7.getString("idplace")) + "");
 
+if(existWay.next()){
+    if (!existWay.getString("time").equals("0")){
+        Update("Update project.shortWay set time=time-1 where (shortWay.start = "+Integer.valueOf(resultSet5.getString("idplace"))+" and shortWay.end = "+Integer.valueOf(resultSet7.getString("idplace"))+") or (shortWay.start = "+Integer.valueOf(resultSet7.getString("idplace"))+" and shortWay.end = "+Integer.valueOf(resultSet5.getString("idplace"))+")");
+        ResultSet resultSet2 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.status = 'action' and zakaz.idplace=place.idplace order by zakaz.date ASC ");
 
-                    Insert("insert into project.shortWay (start,end,string,time) values (" + Integer.valueOf(resultSet5.getString("idplace")) + "," + Integer.valueOf(resultSet7.getString("idplace")) + ",'" + request.getParameter("way") + "',5);");
+        List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
+        while (resultSet2.next()) {
+            zakazs1.add(new Zakaz(resultSet2.getString("nameplace"), resultSet2.getString("date"), Integer.valueOf(resultSet2.getString("idplace"))));
 
-                    ResultSet resultSet2 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.status = 'action' and zakaz.idplace=place.idplace order by zakaz.date ASC ");
+        }
+        ResultSet resultSet3 = getResultSet("Select * from project.place");
 
-                    List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
-                    while (resultSet2.next()) {
-                        zakazs1.add(new Zakaz(resultSet2.getString("nameplace"), resultSet2.getString("date"), Integer.valueOf(resultSet2.getString("idplace"))));
+        List<Place> places = new LinkedList<Place>();
 
-                    }
-                    ResultSet resultSet3 = getResultSet("Select * from project.place");
+        while (resultSet3.next()) {
+            places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
+            if (resultSet3.getString("current").equals("0"))
+                request.setAttribute("current", resultSet3.getString("nameplace"));
+        }
 
-                    List<Place> places = new LinkedList<Place>();
+        request.setAttribute("way", "Доставка осуществлена");
+        request.setAttribute("zakaz1", zakazs1);
+        request.setAttribute("places1", places);
+        request.setAttribute("places2", places);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
 
-                    while (resultSet3.next()) {
-                        places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
-                        if (resultSet3.getString("current").equals("0"))
-                            request.setAttribute("current", resultSet3.getString("nameplace"));
-                    }
+        if (dispatcher != null) {
 
-                    request.setAttribute("way", "Доставка осуществлена");
-                    request.setAttribute("zakaz1", zakazs1);
-                    request.setAttribute("places1", places);
-                    request.setAttribute("places2", places);
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
+            dispatcher.forward(request, response);
 
-                    if (dispatcher != null) {
+        }
 
-                        dispatcher.forward(request, response);
+    }else {
+        Update("Update project.shortWay set  string='" + request.getParameter("way") + "',time=5  where (shortWay.start = "+Integer.valueOf(resultSet5.getString("idplace"))+" and shortWay.end = "+Integer.valueOf(resultSet7.getString("idplace"))+") or (shortWay.start = "+Integer.valueOf(resultSet7.getString("idplace"))+" and shortWay.end = "+Integer.valueOf(resultSet5.getString("idplace"))+")");
+        ResultSet resultSet2 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.status = 'action' and zakaz.idplace=place.idplace order by zakaz.date ASC ");
 
-                    }
+        List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
+        while (resultSet2.next()) {
+            zakazs1.add(new Zakaz(resultSet2.getString("nameplace"), resultSet2.getString("date"), Integer.valueOf(resultSet2.getString("idplace"))));
 
+        }
+        ResultSet resultSet3 = getResultSet("Select * from project.place");
+
+        List<Place> places = new LinkedList<Place>();
+
+        while (resultSet3.next()) {
+            places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
+            if (resultSet3.getString("current").equals("0"))
+                request.setAttribute("current", resultSet3.getString("nameplace"));
+        }
+
+        request.setAttribute("way", "Доставка осуществлена");
+        request.setAttribute("zakaz1", zakazs1);
+        request.setAttribute("places1", places);
+        request.setAttribute("places2", places);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
+
+        if (dispatcher != null) {
+
+            dispatcher.forward(request, response);
+
+        }
+
+    }}
+                    else{
+    Insert("insert into project.shortWay (start,end,string,time) values (" + Integer.valueOf(resultSet5.getString("idplace")) + "," + Integer.valueOf(resultSet7.getString("idplace")) + ",'" + request.getParameter("way") + "',5);");
+
+    ResultSet resultSet2 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.status = 'action' and zakaz.idplace=place.idplace order by zakaz.date ASC ");
+
+    List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
+    while (resultSet2.next()) {
+        zakazs1.add(new Zakaz(resultSet2.getString("nameplace"), resultSet2.getString("date"), Integer.valueOf(resultSet2.getString("idplace"))));
+
+    }
+    ResultSet resultSet3 = getResultSet("Select * from project.place");
+
+    List<Place> places = new LinkedList<Place>();
+
+    while (resultSet3.next()) {
+        places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
+        if (resultSet3.getString("current").equals("0"))
+            request.setAttribute("current", resultSet3.getString("nameplace"));
+    }
+
+    request.setAttribute("way", "Доставка осуществлена");
+    request.setAttribute("zakaz1", zakazs1);
+    request.setAttribute("places1", places);
+    request.setAttribute("places2", places);
+    RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
+
+    if (dispatcher != null) {
+
+        dispatcher.forward(request, response);
+
+    }
+}
                 }
                 else{
 
@@ -344,8 +513,21 @@ public class AdminControl extends HttpServlet implements Connect {
         Connection conn = null;
         Statement stmt = null;
         Class.forName("com.mysql.jdbc.Driver").newInstance();
-        conn = (Connection) DriverManager.getConnection(DB_URL, USER, PASS);
+
+        Properties properties=new Properties();
+        properties.setProperty("user",USER);
+        properties.setProperty("password",PASS);
+        properties.setProperty("useUnicode","true");
+        properties.setProperty("characterEncoding","UTF-8");
+
+        conn = (Connection) DriverManager.getConnection(DB_URL,properties);
         Statement statement = conn.createStatement();
+
+
+        statement.execute("SET NAMES 'utf8';");
+        statement.execute("SET CHARACTER SET 'utf8';");
+        statement.execute("SET SESSION collation_connection = 'utf8_general_ci';");
+
         statement.execute(query);
 
     }
@@ -355,6 +537,7 @@ public class AdminControl extends HttpServlet implements Connect {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         conn = (Connection) DriverManager.getConnection(DB_URL, USER, PASS);
         Statement statement = conn.createStatement();
+        statement.execute("SET CHARACTER SET 'utf8';");
         ResultSet result = statement.executeQuery(query);
         return result;
 
