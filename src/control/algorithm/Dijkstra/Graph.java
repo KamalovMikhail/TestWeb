@@ -74,7 +74,7 @@ public class Graph {
     /** Runs dijkstra using a specified source vertex */
     public void dijkstra(String startName) {
         if (!graph.containsKey(startName)) {
-            System.err.printf("Graph doesn't contain start vertex \"%s\"\n", startName);
+            System.err.printf("Нет доступного пути доставки", startName);
             return;
         }
         final Vertex source = graph.get(startName);
@@ -116,9 +116,8 @@ public class Graph {
     /** Prints a path from the source to the specified vertex */
     public String printPath(String endName) {
         if (!graph.containsKey(endName)) {
-            System.err.printf("Graph doesn't contain end vertex \"%s\"\n", endName);
-            return "Graph doesn't contain end vertex \"%s\"\n" +
-                    "\"";
+            System.err.printf("Нет доступного пути доставки", endName);
+            return "Нет доступного пути доставки";
         }
 
 

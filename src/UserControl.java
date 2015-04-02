@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by mikhail on 30.03.15.
@@ -99,10 +100,20 @@ public class UserControl extends HttpServlet  implements Connect {
         Connection conn = null;
         Statement stmt = null;
         Class.forName("com.mysql.jdbc.Driver").newInstance();
-        conn = (Connection) DriverManager.getConnection(DB_URL, USER, PASS);
 
+        Properties properties=new Properties();
+        properties.setProperty("user",USER);
+        properties.setProperty("password",PASS);
+        properties.setProperty("useUnicode","true");
+        properties.setProperty("characterEncoding","UTF-8");
+
+        conn = (Connection) DriverManager.getConnection(DB_URL,properties);
         Statement statement = conn.createStatement();
+
+
+        statement.execute("SET NAMES 'utf8';");
         statement.execute("SET CHARACTER SET 'utf8';");
+        statement.execute("SET SESSION collation_connection = 'utf8_general_ci';");
         statement.execute(query);
 
     }

@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by mikhail on 07.03.15.
@@ -22,23 +24,17 @@ public class Servlet extends HttpServlet implements Connect {
 
         String login = request.getParameter("login");
         String pass = request.getParameter("pass");
-        String query1 = "SELECT * FROM project.user where user.login = '" + login + "';";
-        String query2 = "SELECT * FROM project.user where user.login = '" + login + "' and user.password='"+pass+"';";
-        try {
-            ResultSet resultSet = getResultSet(query1);
-            if(!resultSet.next()){
-                request.setAttribute("err", "Такого пользователя не существует");
-                RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+        Pattern p = Pattern.compile("^[a-z0-9_-]{3,15}$");
+        Matcher m1 = p.matcher(login);
+        Matcher m2 = p.matcher(login);
 
-                if (dispatcher != null) {
-
-                    dispatcher.forward(request, response);
-
-                }
-            }else{
-                ResultSet resultSet2 = getResultSet(query2);
-                if (!resultSet2.next()){
-                    request.setAttribute("err", "Вы неправильно ввели пароль");
+        if (m1.matches() && m2.matches()) {
+            String query1 = "SELECT * FROM project.user where user.login = '" + login + "';";
+            String query2 = "SELECT * FROM project.user where user.login = '" + login + "' and user.password='" + pass + "';";
+            try {
+                ResultSet resultSet = getResultSet(query1);
+                if (!resultSet.next()) {
+                    request.setAttribute("err", "Такого пользователя не существует");
                     RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
 
                     if (dispatcher != null) {
@@ -46,53 +42,63 @@ public class Servlet extends HttpServlet implements Connect {
                         dispatcher.forward(request, response);
 
                     }
-                }
-                else{
+                } else {
+                    ResultSet resultSet2 = getResultSet(query2);
+                    if (!resultSet2.next()) {
+                        request.setAttribute("err", "Вы неправильно ввели пароль");
+                        RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+
+                        if (dispatcher != null) {
+
+                            dispatcher.forward(request, response);
+
+                        }
+                    } else {
 
 
-                        if (resultSet2.getString("status").equals("0")){
+                        if (resultSet2.getString("status").equals("0")) {
                             ResultSet resultSet3 = getResultSet("Select * from project.place");
 
                             List<Place> places = new LinkedList<Place>();
                             String idu = resultSet2.getString("iduser");
                             while (resultSet3.next()) {
-                                places.add(new Place(resultSet3.getString("nameplace"),Integer.valueOf(resultSet3.getString("idplace"))));
+                                places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
 
                             }
 
                             List<Zakaz> zakazs1 = new LinkedList<Zakaz>();
-                            ResultSet resultSet4 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.iduser = "+Integer.valueOf(idu)+" and zakaz.status = 'action' and zakaz.idplace=place.idplace");
+                            ResultSet resultSet4 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.iduser = " + Integer.valueOf(idu) + " and zakaz.status = 'action' and zakaz.idplace=place.idplace");
 
                             while (resultSet4.next()) {
-                                zakazs1.add(new Zakaz(resultSet4.getString("nameplace"),resultSet4.getString("date"),Integer.valueOf(resultSet4.getString("idplace"))));
+                                zakazs1.add(new Zakaz(resultSet4.getString("nameplace"), resultSet4.getString("date"), Integer.valueOf(resultSet4.getString("idplace"))));
 
                             }
 
 
                             List<Zakaz> zakazs2 = new LinkedList<Zakaz>();
-                            ResultSet resultSet5 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.iduser = "+Integer.valueOf(idu)+" and zakaz.status = 'end' and zakaz.idplace=place.idplace");
+                            ResultSet resultSet5 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.iduser = " + Integer.valueOf(idu) + " and zakaz.status = 'end' and zakaz.idplace=place.idplace");
 
                             while (resultSet5.next()) {
-                                zakazs2.add(new Zakaz(resultSet5.getString("nameplace"),resultSet5.getString("date"),Integer.valueOf(resultSet5.getString("idplace"))));
+                                zakazs2.add(new Zakaz(resultSet5.getString("nameplace"), resultSet5.getString("date"), Integer.valueOf(resultSet5.getString("idplace"))));
 
                             }
 
                             List<Zakaz> zakazs3 = new LinkedList<Zakaz>();
-                            ResultSet resultSet6 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.iduser = "+Integer.valueOf(idu)+" and zakaz.status = 'not' and zakaz.idplace=place.idplace");
+                            ResultSet resultSet6 = getResultSet("Select place.nameplace, zakaz.date,zakaz.idplace from project.zakaz,project.place where zakaz.iduser = " + Integer.valueOf(idu) + " and zakaz.status = 'not' and zakaz.idplace=place.idplace");
 
                             while (resultSet6.next()) {
-                                zakazs3.add(new Zakaz(resultSet6.getString("nameplace"),resultSet6.getString("date"),Integer.valueOf(resultSet6.getString("idplace"))));
+                                zakazs3.add(new Zakaz(resultSet6.getString("nameplace"), resultSet6.getString("date"), Integer.valueOf(resultSet6.getString("idplace"))));
 
                             }
 
 
-                            request.setAttribute("zakaz1",zakazs1);
-                            request.setAttribute("zakaz2",zakazs2);
-                            request.setAttribute("zakaz3",zakazs3);
-                            request.setAttribute("places",places);
+                            request.setAttribute("zakaz1", zakazs1);
+                            request.setAttribute("zakaz2", zakazs2);
+                            request.setAttribute("zakaz3", zakazs3);
+                            request.setAttribute("places", places);
 
-                            request.setAttribute("places",places);
-                            request.setAttribute("idu",idu);
+                            request.setAttribute("places", places);
+                            request.setAttribute("idu", idu);
                             RequestDispatcher dispatcher = request.getRequestDispatcher("User.jsp");
 
                             if (dispatcher != null) {
@@ -100,8 +106,7 @@ public class Servlet extends HttpServlet implements Connect {
                                 dispatcher.forward(request, response);
 
                             }
-                        }
-                    else{
+                        } else {
                             ResultSet resultSet3 = getResultSet("Select * from project.place");
 
                             List<Place> places = new LinkedList<Place>();
@@ -109,15 +114,13 @@ public class Servlet extends HttpServlet implements Connect {
                             while (resultSet3.next()) {
                                 if (resultSet3.getString("current").equals("0"))
                                     request.setAttribute("current", resultSet3.getString("nameplace"));
-                                places.add(new Place(resultSet3.getString("nameplace"),Integer.valueOf(resultSet3.getString("idplace"))));
+                                places.add(new Place(resultSet3.getString("nameplace"), Integer.valueOf(resultSet3.getString("idplace"))));
 
                             }
 
 
-
-
-                            request.setAttribute("places1",places);
-                            request.setAttribute("places2",places);
+                            request.setAttribute("places1", places);
+                            request.setAttribute("places2", places);
                             RequestDispatcher dispatcher = request.getRequestDispatcher("Admin.jsp");
 
                             if (dispatcher != null) {
@@ -128,20 +131,31 @@ public class Servlet extends HttpServlet implements Connect {
                         }
 
 
+                    }
                 }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
             }
 
-    } catch (SQLException e) {
-        e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-        e.printStackTrace();
-    } catch (IllegalAccessException e) {
-        e.printStackTrace();
-    } catch (InstantiationException e) {
-        e.printStackTrace();
-    }
+        }
+        else
+        {
+            request.setAttribute("err", "Ошибка ввода данных");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
 
+            if (dispatcher != null) {
 
+                dispatcher.forward(request, response);
+
+            }
+        }
 
        /* if (!request.getParameter("place").equals("")){
             try {
